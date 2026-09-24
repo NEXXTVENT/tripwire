@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import fcntl
 import time
-from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable, Optional
 
 from .approvals import APPROVED, ApprovalStore
+from .filelock import locked
 from .audit import AuditLog
 from .models import OrderIntent, Verdict
 from .notify import NullNotifier, Notifier
@@ -37,15 +36,9 @@ class Firewall:
         self.approvals = ApprovalStore(self.data_dir / "approvals.json", ttl_seconds=approval_ttl, clock=clock)
         self.notifier = notifier or NullNotifier()
 
-    @contextmanager
     def _locked(self):
         """Serialize state changes across processes (MCP server, CLI, Telegram bot)."""
-        with open(self.data_dir / ".lock", "w") as lf:
-            fcntl.flock(lf, fcntl.LOCK_EX)
-            try:
-                yield
-            finally:
-                fcntl.flock(lf, fcntl.LOCK_UN)
+        return locked(self.data_dir / ".lock")
 
     # ------------------------------------------------------------------ reads
     def status(self) -> dict:

@@ -44,6 +44,16 @@ python examples/demo.py      # scripted misbehaving agent vs Tripwire
 pytest -q                    # 42 tests
 ```
 
+### Windows (PowerShell)
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1      # if blocked: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+pip install -e ".[dev]"
+python examples\demo.py
+pytest -q
+```
+
 ## Connect an agent
 
 Claude Desktop / Claude Code / any MCP client:
@@ -65,10 +75,10 @@ Copy `examples/tripwire.yaml` and `examples/policy.yaml` next to each other and 
 ## Testnet runbook
 
 1. **Fresh wallet.** Create a new wallet for testing only. Never use a wallet that holds real funds or runs another bot.
-2. **Testnet funds.** Get testnet USDC from the Hyperliquid testnet faucet (app.hyperliquid-testnet.xyz; the faucet may require a prior mainnet deposit from that address, check the current rules).
+2. **Testnet funds.** The faucet (app.hyperliquid-testnet.xyz/drip) gives 1,000 mock USDC, but only to addresses that have made a mainnet deposit. So deposit a few USDC on mainnet from the fresh wallet first, then claim on testnet with the same address.
 3. **Agent wallet.** On the testnet app: More → API → generate an API (agent) wallet and authorize it. Copy its private key. This key can trade, **not withdraw**.
 4. **Config.** In `tripwire.yaml` set `venue: hyperliquid`, `network: testnet`, `account_address: <your master address>` (the funded one, not the agent address).
-5. **Env.** `export HL_AGENT_PRIVATE_KEY=0x...` (optional: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`).
+5. **Env.** `export HL_AGENT_PRIVATE_KEY=0x...` (Windows PowerShell: `$env:HL_AGENT_PRIVATE_KEY="0x..."`). Optional: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`.
 6. **Check.** `tripwire --config tripwire.yaml status` should show your testnet equity.
 7. **Run.** Connect your agent via the MCP config above. In another terminal: `tripwire telegram` (buttons) or `tripwire pending` / `tripwire approve <id>`.
 

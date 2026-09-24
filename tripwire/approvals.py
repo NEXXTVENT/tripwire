@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 import secrets
 import time
-from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Optional
+
+from .filelock import locked
 
 PENDING, APPROVED, DENIED, EXECUTED, EXPIRED = "pending", "approved", "denied", "executed", "expired"
 
@@ -20,15 +20,9 @@ class ApprovalStore:
         self.ttl = ttl_seconds
         self.clock = clock
 
-    @contextmanager
     def _locked(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.path.with_suffix(".lock"), "w") as lf:
-            fcntl.flock(lf, fcntl.LOCK_EX)
-            try:
-                yield
-            finally:
-                fcntl.flock(lf, fcntl.LOCK_UN)
+        return locked(self.path.with_suffix(".lock"))
 
     def _load(self) -> dict[str, dict]:
         if not self.path.exists():
