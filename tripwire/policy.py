@@ -80,7 +80,7 @@ class PolicyEngine:
         """Update day-start equity and high-water mark; latch HALT if a loss limit is hit."""
         p = self.policy
         state.roll_day(snap.equity, now)
-        state.high_water_mark = max(state.high_water_mark or snap.equity, snap.equity)
+        state.high_water_mark = max(state.high_water_mark or 0.0, snap.equity)
 
         if state.halted:
             return

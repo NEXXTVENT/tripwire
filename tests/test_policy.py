@@ -179,3 +179,18 @@ def test_policy_rejects_nonpositive(tmp_path):
     f.write_text("max_leverage: 0\n")
     with pytest.raises(ValueError):
         Policy.load(f)
+
+
+def test_empty_account_then_funded_rebaselines():
+    e = engine(daily_loss_limit_pct=5.0)
+    st = RiskState()
+    e.observe(snap(equity=0.0), st, NOW)
+    e.observe(snap(equity=1_000.0), st, NOW + 60)
+    assert st.day_start_equity == 1_000.0 and st.high_water_mark == 1_000.0
+    e.observe(snap(equity=940.0), st, NOW + 120)
+    assert st.halted
+
+
+def test_zero_equity_denies_new_risk():
+    d = engine().evaluate(OrderIntent("BTC", True, 0.001), snap(equity=0.0), RiskState(), NOW)
+    assert d.verdict == Verdict.DENY

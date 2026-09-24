@@ -27,7 +27,9 @@ class RiskState:
 
     def roll_day(self, equity: float, now: float) -> None:
         today = utc_day(now)
-        if self.day != today:
+        # Re-baseline on a new day, or if the baseline is unusable (e.g. account was empty
+        # when first seen and got funded later); otherwise the daily-loss limit never fires.
+        if self.day != today or not self.day_start_equity or self.day_start_equity <= 0:
             self.day = today
             self.day_start_equity = equity
 
