@@ -29,6 +29,17 @@ def main(argv: list[str] | None = None) -> int:
     v.add_argument("action", choices=["show", "verify"])
     v.add_argument("-n", type=int, default=20)
     sub.add_parser("telegram", help="run the Telegram approval bot (long polling)")
+    for name, hlp in (("check", "dry-run an order through the policy"), ("order", "place an order through the firewall")):
+        o = sub.add_parser(name, help=hlp)
+        o.add_argument("side", choices=["buy", "sell"])
+        o.add_argument("coin")
+        o.add_argument("size", type=float, help="base units, e.g. 0.01 for ETH")
+        o.add_argument("--limit", type=float, help="limit price (default: market)")
+        o.add_argument("--reduce-only", action="store_true")
+        o.add_argument("--reason", default="manual test from CLI")
+    c = sub.add_parser("close", help="close a whole position (reduce-only)")
+    c.add_argument("coin")
+    ex = sub.add_parser("execute", help="execute an approved order"); ex.add_argument("id")
     args = ap.parse_args(argv)
 
     if args.cmd == "serve":
@@ -64,6 +75,15 @@ def main(argv: list[str] | None = None) -> int:
             print(msg)
             return 0 if ok else 2
         _print(fw.audit.entries(last=args.n))
+    elif args.cmd in ("check", "order"):
+        from .models import OrderIntent
+        intent = OrderIntent(args.coin.upper(), args.side == "buy", args.size,
+                             "limit" if args.limit else "market", args.limit, args.reduce_only)
+        _print(fw.check(intent) if args.cmd == "check" else fw.submit(intent, reason=f"[{who}] {args.reason}"))
+    elif args.cmd == "close":
+        _print(fw.close_position(args.coin, reason=f"[{who}] manual close"))
+    elif args.cmd == "execute":
+        _print(fw.execute_approved(args.id))
     elif args.cmd == "telegram":
         from .notify import TelegramNotifier
         if not isinstance(fw.notifier, TelegramNotifier):
