@@ -1,0 +1,12 @@
+# Tripwire policy. Unknown keys are rejected so a typo can't silently disable a limit.
+allowed_markets: [BTC, ETH, SOL, HYPE]
+max_order_notional_usd: 1000        # single order cap
+max_position_notional_usd: 2500     # per-market position cap (after the trade)
+max_gross_exposure_usd: 5000        # all positions combined (after the trade)
+max_leverage: 3.0                   # gross exposure / equity (after the trade)
+max_price_deviation_pct: 2.0        # limit price vs mid: fat-finger guard
+max_orders_per_minute: 10           # runaway-loop guard
+daily_loss_limit_pct: 5.0           # HALT when equity is down 5% on the UTC day
+max_drawdown_pct: 15.0              # HALT when equity is 15% below its high-water mark
+require_approval_above_usd: 500     # ask a human above this (set to null to disable)
+allow_reducing_when_halted: true    # let the agent de-risk while halted

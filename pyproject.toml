@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tripwire-hl"
+version = "0.1.0"
+description = "Risk firewall between AI trading agents and Hyperliquid (MCP server)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+  "mcp>=1.2",
+  "hyperliquid-python-sdk>=0.20",
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+tripwire = "tripwire.cli:main"
+
+[tool.setuptools]
+packages = ["tripwire"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

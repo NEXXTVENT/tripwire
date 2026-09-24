@@ -1,0 +1,11 @@
+# Tripwire runtime config. Secrets NEVER go here; they come from env vars:
+#   HL_AGENT_PRIVATE_KEY   agent (API) wallet key: can trade, cannot withdraw
+#   TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID   optional, for approve/deny buttons
+venue: mock                 # mock | hyperliquid
+network: testnet            # testnet | mainnet (mainnet also needs TRIPWIRE_ALLOW_MAINNET=1)
+account_address: ""         # your MASTER account address (the one holding funds)
+policy: policy.yaml
+data_dir: .tripwire         # state, approvals, audit log
+approval_ttl_seconds: 600
+market_slippage: 0.01
+mock_equity: 10000

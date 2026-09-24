@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.tripwire/
+data/
+.env
+tripwire.yaml
+policy.yaml
+!examples/*.yaml
