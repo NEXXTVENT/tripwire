@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
-  "mcp>=1.2",
+  "mcp>=1.2,<2",
   "hyperliquid-python-sdk>=0.20",
   "pyyaml>=6",
 ]
